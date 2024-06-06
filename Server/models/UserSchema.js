@@ -14,7 +14,7 @@ const UserSchema = new Schema(
       role: {
         type: String,
         require:true,
-        default:'stockControl',
+        default:'admin',
         enum: ["stockControl", "admin"],
       },
       password: {
