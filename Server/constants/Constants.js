@@ -2,7 +2,8 @@ const express = require("express");
 
 export const userRoles = {
     STOCK_CONTROL: 'stockControl',
-    ADMIN: 'admin'
+    ADMIN: 'admin',
+    EMPLOYEE: 'employee'
   };
 
   export const productUnit = {

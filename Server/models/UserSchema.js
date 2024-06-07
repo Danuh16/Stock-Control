@@ -10,19 +10,42 @@ const UserSchema = new Schema(
       email: {
         type: String,
         required: true,
-      },
-      role: {
-        type: String,
-        require:true,
-        default:'admin',
-        enum: ["stockControl", "admin"],
+        unique: true,
       },
       password: {
         type: String,
         required: true,
       },
+      role: {
+        type: String,
+        required: true,
+        enum: ['admin', 'stockControl', 'employee'],
+      },
+      permissions: {
+        type: [String],
+        required: true,
+      },
+      verificationToken: {
+        type: String,
+      },
+      verificationExpires: {
+        type: Date,
+      },
+      resetPasswordToken: {
+        type: String,
+      },
+      resetPasswordExpires: {
+        type: Date,
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+      updatedAt: {
+        type: Date,
+        default: Date.now,
+      },
     },
-    { timestamps: true }
   );
   
   module.exports = mongoose.model("User", UserSchema);

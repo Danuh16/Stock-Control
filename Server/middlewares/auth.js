@@ -26,15 +26,20 @@ const userAuth = (req, res, next) => {
     return res.status(403).json({ message: 'Failed to authenticate token' });
   }
 };
-  const checkRole = (allowedRoles) => {
-    return (req, res, next) => {
-      // Check if the user's role is in the allowed roles
-      if (req.user && allowedRoles.includes(req.user.role)) {
+const checkRoleAndPermission = (allowedRoles, allowedPermissions) => {
+  return (req, res, next) => {
+    // Check if the user's role is in the allowed roles
+    if (req.user && allowedRoles.includes(req.user.role)) {
+      // Check if the user has the required permissions
+      if (allowedPermissions.every(permission => req.user.permissions.includes(permission))) {
         next();
       } else {
         return res.status(403).json({ message: 'Forbidden' });
       }
-    };
+    } else {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
   };
+};
   
-  module.exports = { userAuth, checkRole };
+  module.exports = { userAuth, checkRoleAndPermission };

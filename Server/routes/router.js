@@ -1,48 +1,37 @@
 const express = require("express");
 const router = express.Router();
-const userController = require("../contollers/userController");
-const { userAuth, checkRole } = require("../middlewares/auth");
+const { userSignup, userLogin, userLogout, forgotPassword }  = require("../contollers/userController");
+const { userAuth, checkRoleAndPermission } = require("../middlewares/auth");
 const Product = require("../models/ProductSchema");
+const ProductCategory= require('../models/ProductCategoriesSchema');
 const Ingredient = require("../models/IngredientSchema");
 const ProductRecipe = require("../models/ProductRecipesSchema");
 const StockMovement = require("../models/StockMovementSchema");
 const StockLevel = require("../models/StockLevelSchema");
 
-// Stock Control Registration Route
-router.post("/register-stockControl", async (req, res) => {
-  await userController.userSignup(req.body, "stockControl", res);
+//Registration Route
+router.post('/signup', async (req, res) => {
+  await userSignup(req.body, req.body.role, res);
 });
 
-// Admin Registration route
-router.post("/register-admin", async (req, res) => {
-  await userController.userSignup(req.body, "admin", res);
+//Login Route
+router.post('/login/:role', async (req, res) => {
+  await userLogin(req, res);
 });
 
-// Stock Control Login Route
-router.post("/Login-stockControl", async (req, res) => {
-  await userController.userLogin(req.body, "stockControl", res);
-});
+//LOGOUT
+router.post('/logout', userLogout);
 
-// Admin Login Route
-router.post("/Login-admin", async (req, res) => {
-  await userController.userLogin(req.body, "admin", res);
-});
+//FORGOT PASSWORD
+router.post('/forgot-password', forgotPassword);
 
+// Protected Routes
 router.get(
-  "/stockControl-protected",
+  '/protected',
   userAuth,
-  checkRole(["stockControl"]),
+  checkRoleAndPermission(['admin', 'stockControl'], ['read', 'update']),
   async (req, res) => {
-    return res.json(`welcome ${req.user.fullName}`);
-  }
-);
-
-router.get(
-  "/admin-protected",
-  userAuth,
-  checkRole(["admin"]),
-  async (req, res) => {
-    return res.json(`welcome ${req.user.fullName}`);
+    return res.json(`Welcome ${req.user.fullName}`);
   }
 );
 
@@ -256,6 +245,89 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ message: "Ingredient not found" });
     }
     res.json(ingredient);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+//PRODUCT CATEGORY
+// Create a new product category
+router.post('/newProductCategory', async (req, res) => {
+  try {
+    const { categoryId, categoryName, categoryDescription } = req.body;
+
+    // Check if the product category already exists
+    const existingCategory = await ProductCategory.findOne({ categoryId });
+    if (existingCategory) {
+      return res.status(400).json({ message: 'Product category already exists' });
+    }
+
+    // Create a new product category
+    const productCategory = new ProductCategory({
+      categoryId,
+      categoryName,
+      categoryDescription
+    });
+
+    await productCategory.save();
+    res.status(201).json(productCategory);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Update an existing product category
+router.patch('/:id', async (req, res) => {
+  try {
+    const productCategory = await ProductCategory.findOne({ _id: req.params.id });
+    if (!productCategory) {
+      return res.status(404).json({ message: 'Product category not found' });
+    }
+
+    // Update the product category with the new information
+    productCategory.categoryName = req.body.categoryName || productCategory.categoryName;
+    productCategory.categoryDescription = req.body.categoryDescription || productCategory.categoryDescription;
+
+    await productCategory.save();
+    res.json(productCategory);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Delete a product category
+router.delete('/:id', async (req, res) => {
+  try {
+    const productCategory = await ProductCategory.findOne({ _id: req.params.id });
+    if (!productCategory) {
+      return res.status(404).json({ message: 'Product category not found' });
+    }
+
+    await productCategory.deleteOne();
+    res.json({ message: 'Product category deleted' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get all product categories
+router.get('/allProductCategory', async (req, res) => {
+  try {
+    const productCategories = await ProductCategory.find();
+    res.json(productCategories);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get a specific product category
+router.get('/:id', async (req, res) => {
+  try {
+    const productCategory = await ProductCategory.findOne({ _id: req.params.id });
+    if (!productCategory) {
+      return res.status(404).json({ message: 'Product category not found' });
+    }
+    res.json(productCategory);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

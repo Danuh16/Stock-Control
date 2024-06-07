@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const ProductCategorySchema = new Schema(
+const productCategorySchema = new Schema(
   {
     categoryId: {
       type: String,
@@ -16,9 +16,16 @@ const ProductCategorySchema = new Schema(
     categoryDescription: {
       type: String,
       required: true
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now
     }
   },
-  { timestamps: true }
 );
 
-module.exports = mongoose.model('ProductCategory', ProductCategorySchema);
+module.exports = mongoose.model('ProductCategory', productCategorySchema);

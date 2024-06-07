@@ -6,13 +6,12 @@ const mongoose = require("mongoose");
 require("dotenv/config");
 
 const app = express();
-console.log(process.cwd());
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const corsOptions = {
-  origin: "*",
+  origin: "*", // Replace with allowed origin
   optionsSuccessStatus: 200,
 };
 
@@ -28,9 +27,10 @@ mongoose
   })
   .then(() => console.log("DB Connected!"))
   .catch((err) => console.log(err));
-  
+
 const host = process.env.HOST || "localhost";
 const port = process.env.PORT || 8000;
+
 app.listen(port, () => {
-  console.log(`Server is running on port http://${host}: ${port}`);
+  console.log(`Server is running on port http://${host}:${port}`);
 });
