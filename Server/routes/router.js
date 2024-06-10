@@ -35,6 +35,12 @@ router.get(
   }
 );
 
+let currentId = 0;
+
+function generateId() {
+  currentId++;
+  return `${currentId}`;
+}
 //PRODUCT
 // Create a new product
 router.post("/newProduct", async (req, res) => {
@@ -59,7 +65,7 @@ router.post("/newProduct", async (req, res) => {
 
     // Create a new product
     const product = new Product({
-      productId,
+      productId: generateId(),
       productName,
       productDescription,
       productCategoriesId,
@@ -167,7 +173,7 @@ router.post("/newIngredient", async (req, res) => {
 
     // Create a new ingredient
     const ingredient = new Ingredient({
-      ingredientId,
+      ingredientId: generateId(),
       ingredientName,
       ingredientUnit,
       ingredientUnitPrice,
@@ -264,7 +270,7 @@ router.post('/newProductCategory', async (req, res) => {
 
     // Create a new product category
     const productCategory = new ProductCategory({
-      categoryId,
+      categoryId: generateId(),
       categoryName,
       categoryDescription
     });
@@ -353,7 +359,7 @@ router.post("/newProductRecipe", async (req, res) => {
 
     // Create a new product recipe
     const productRecipe = new ProductRecipe({
-      recipeId,
+      recipeId: generateId(),
       productId,
       ingredients,
       instructions,
@@ -471,7 +477,7 @@ router.post("/newStockMovement", async (req, res) => {
 
     // Create a new stock movement
     const stockMovement = new StockMovement({
-      stockMovementId,
+      stockMovementId: generateId(),
       productId,
       ingredientId,
       movementType,

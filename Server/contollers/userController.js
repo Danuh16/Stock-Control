@@ -100,7 +100,6 @@ const userLogin = async (req, res) => {
     });
   }
 
-  console.log("result",user.role,req.params)
   // Check if the user is logging in via the route for their department
   if (user.role !== req.params.role) {
     return res.status(403).json({

@@ -20,13 +20,19 @@ app.use("/", router);
 
 mongoose.set("strictQuery", true);
 
+const mongoURI = process.env.MONGODB_URI;
+
+// Connect to MongoDB using Mongoose
 mongoose
-  .connect(process.env.MONGODB_URI, {
+  .connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("DB Connected!"))
-  .catch((err) => console.log(err));
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => {
+    console.error("Error connecting to MongoDB:", err);
+    process.exit(1); // Exit the process with an error code
+  });
 
 const host = process.env.HOST || "localhost";
 const port = process.env.PORT || 8000;
