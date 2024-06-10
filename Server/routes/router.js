@@ -1,35 +1,40 @@
 const express = require("express");
 const router = express.Router();
-const { userSignup, userLogin, userLogout, forgotPassword }  = require("../contollers/userController");
+const {
+  userSignup,
+  userLogin,
+  userLogout,
+  forgotPassword,
+} = require("../contollers/userController");
 const { userAuth, checkRoleAndPermission } = require("../middlewares/auth");
 const Product = require("../models/ProductSchema");
-const ProductCategory= require('../models/ProductCategoriesSchema');
+const ProductCategory = require("../models/ProductCategoriesSchema");
 const Ingredient = require("../models/IngredientSchema");
 const ProductRecipe = require("../models/ProductRecipesSchema");
 const StockMovement = require("../models/StockMovementSchema");
 const StockLevel = require("../models/StockLevelSchema");
 
 //Registration Route
-router.post('/signup', async (req, res) => {
+router.post("/signup", async (req, res) => {
   await userSignup(req.body, req.body.role, res);
 });
 
 //Login Route
-router.post('/login/:role', async (req, res) => {
+router.post("/login/:role", async (req, res) => {
   await userLogin(req, res);
 });
 
 //LOGOUT
-router.post('/logout', userLogout);
+router.post("/logout", userLogout);
 
 //FORGOT PASSWORD
-router.post('/forgot-password', forgotPassword);
+router.post("/forgot-password", forgotPassword);
 
 // Protected Routes
 router.get(
-  '/protected',
+  "/protected",
   userAuth,
-  checkRoleAndPermission(['admin', 'stockControl'], ['read', 'update']),
+  checkRoleAndPermission(["admin", "stockControl"], ["read", "update"]),
   async (req, res) => {
     return res.json(`Welcome ${req.user.fullName}`);
   }
@@ -84,7 +89,7 @@ router.post("/newProduct", async (req, res) => {
 });
 
 // Update an existing product
-router.patch("/:id", async (req, res) => {
+router.patch("/update/:id", async (req, res) => {
   try {
     const product = await Product.findOne({ _id: req.params.id });
     if (!product) {
@@ -115,7 +120,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 // Delete a product
-router.delete("/:id", async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
   try {
     const product = await Product.findOne({ _id: req.params.id });
     if (!product) {
@@ -139,7 +144,7 @@ router.get("/allProduct", async (req, res) => {
 });
 
 // Get a specific product
-router.get("/:id", async (req, res) => {
+router.get("/get/:id", async (req, res) => {
   try {
     const product = await Product.findOne({ _id: req.params.id });
     if (!product) {
@@ -190,7 +195,7 @@ router.post("/newIngredient", async (req, res) => {
 });
 
 // Update an existing ingredient
-router.patch("/:id", async (req, res) => {
+router.patch("/update/:id", async (req, res) => {
   try {
     const ingredient = await Ingredient.findOne({ _id: req.params.id });
     if (!ingredient) {
@@ -219,7 +224,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 // Delete an ingredient
-router.delete("/:id", async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
   try {
     const ingredient = await Ingredient.findOne({ _id: req.params.id });
     if (!ingredient) {
@@ -244,7 +249,7 @@ router.get("/allIngredient", async (req, res) => {
 });
 
 // Get a specific ingredient
-router.get("/:id", async (req, res) => {
+router.get("/get/:id", async (req, res) => {
   try {
     const ingredient = await Ingredient.findOne({ _id: req.params.id });
     if (!ingredient) {
@@ -258,21 +263,23 @@ router.get("/:id", async (req, res) => {
 
 //PRODUCT CATEGORY
 // Create a new product category
-router.post('/newProductCategory', async (req, res) => {
+router.post("/newProductCategory", async (req, res) => {
   try {
     const { categoryId, categoryName, categoryDescription } = req.body;
 
     // Check if the product category already exists
     const existingCategory = await ProductCategory.findOne({ categoryId });
     if (existingCategory) {
-      return res.status(400).json({ message: 'Product category already exists' });
+      return res
+        .status(400)
+        .json({ message: "Product category already exists" });
     }
 
     // Create a new product category
     const productCategory = new ProductCategory({
       categoryId: generateId(),
       categoryName,
-      categoryDescription
+      categoryDescription,
     });
 
     await productCategory.save();
@@ -283,16 +290,20 @@ router.post('/newProductCategory', async (req, res) => {
 });
 
 // Update an existing product category
-router.patch('/:id', async (req, res) => {
+router.patch("/update/:id", async (req, res) => {
   try {
-    const productCategory = await ProductCategory.findOne({ _id: req.params.id });
+    const productCategory = await ProductCategory.findOne({
+      _id: req.params.id,
+    });
     if (!productCategory) {
-      return res.status(404).json({ message: 'Product category not found' });
+      return res.status(404).json({ message: "Product category not found" });
     }
 
     // Update the product category with the new information
-    productCategory.categoryName = req.body.categoryName || productCategory.categoryName;
-    productCategory.categoryDescription = req.body.categoryDescription || productCategory.categoryDescription;
+    productCategory.categoryName =
+      req.body.categoryName || productCategory.categoryName;
+    productCategory.categoryDescription =
+      req.body.categoryDescription || productCategory.categoryDescription;
 
     await productCategory.save();
     res.json(productCategory);
@@ -302,22 +313,24 @@ router.patch('/:id', async (req, res) => {
 });
 
 // Delete a product category
-router.delete('/:id', async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
   try {
-    const productCategory = await ProductCategory.findOne({ _id: req.params.id });
+    const productCategory = await ProductCategory.findOne({
+      _id: req.params.id,
+    });
     if (!productCategory) {
-      return res.status(404).json({ message: 'Product category not found' });
+      return res.status(404).json({ message: "Product category not found" });
     }
 
     await productCategory.deleteOne();
-    res.json({ message: 'Product category deleted' });
+    res.json({ message: "Product category deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
 // Get all product categories
-router.get('/allProductCategory', async (req, res) => {
+router.get("/allProductCategory", async (req, res) => {
   try {
     const productCategories = await ProductCategory.find();
     res.json(productCategories);
@@ -327,11 +340,13 @@ router.get('/allProductCategory', async (req, res) => {
 });
 
 // Get a specific product category
-router.get('/:id', async (req, res) => {
+router.get("/get/:id", async (req, res) => {
   try {
-    const productCategory = await ProductCategory.findOne({ _id: req.params.id });
+    const productCategory = await ProductCategory.findOne({
+      _id: req.params.id,
+    });
     if (!productCategory) {
-      return res.status(404).json({ message: 'Product category not found' });
+      return res.status(404).json({ message: "Product category not found" });
     }
     res.json(productCategory);
   } catch (error) {
@@ -374,7 +389,7 @@ router.post("/newProductRecipe", async (req, res) => {
 });
 
 // Update an existing product recipe
-router.patch("/:id", async (req, res) => {
+router.patch("/update/:id", async (req, res) => {
   try {
     const productRecipe = await ProductRecipe.findOne({ _id: req.params.id });
     if (!productRecipe) {
@@ -397,7 +412,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 // Delete a product recipe
-router.delete("/:id", async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
   try {
     const productRecipe = await ProductRecipe.findOne({ _id: req.params.id });
     if (!productRecipe) {
@@ -422,7 +437,7 @@ router.get("/allProductRecipes", async (req, res) => {
 });
 
 // Get a specific product recipe
-router.get("/:id", async (req, res) => {
+router.get("/get/:id", async (req, res) => {
   try {
     const productRecipe = await ProductRecipe.findOne({ _id: req.params.id });
     if (!productRecipe) {
@@ -503,7 +518,7 @@ router.post("/newStockMovement", async (req, res) => {
 });
 
 // Update an existing stock movement
-router.patch("/:id", async (req, res) => {
+router.patch("/update/:id", async (req, res) => {
   try {
     const stockMovement = await StockMovement.findOne({ _id: req.params.id });
     if (!stockMovement) {
@@ -542,7 +557,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 // Delete a stock movement
-router.delete("/:id", async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
   try {
     const stockMovement = await StockMovement.findOne({ _id: req.params.id });
     if (!stockMovement) {
@@ -582,7 +597,7 @@ router.get("/allStockMovement", async (req, res) => {
 });
 
 // Get a specific stock movement
-router.get("/:id", async (req, res) => {
+router.get("/get/:id", async (req, res) => {
   try {
     const stockMovement = await StockMovement.findOne({ _id: req.params.id });
     if (!stockMovement) {
@@ -665,7 +680,7 @@ router.post("/newStockLevel", async (req, res) => {
 });
 
 // Update an existing stock level
-router.patch("/:id", async (req, res) => {
+router.patch("/update/:id", async (req, res) => {
   try {
     const stockLevel = await StockLevel.findOne({ _id: req.params.id });
     if (!stockLevel) {
@@ -688,7 +703,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 // Delete a stock level
-router.delete("/:id", async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
   try {
     const stockLevel = await StockLevel.findOne({ _id: req.params.id });
     if (!stockLevel) {
@@ -713,7 +728,7 @@ router.get("/allStockLevel", async (req, res) => {
 });
 
 // Get a specific stock level
-router.get("/:id", async (req, res) => {
+router.get("/get/:id", async (req, res) => {
   try {
     const stockLevel = await StockLevel.findOne({ _id: req.params.id });
     if (!stockLevel) {
