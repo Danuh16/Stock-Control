@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const ingredientUnit =require('../constants/Constants')
 
 const ingredientSchema = new mongoose.Schema({
   ingredientId: {
@@ -14,7 +15,7 @@ const ingredientSchema = new mongoose.Schema({
   ingredientUnit: {
     type: String,
     required: true,
-    enum: ['kg', 'g', 'l', 'ml', 'pcs']
+   enum: Object.values(ingredientUnit)
   },
   ingredientUnitPrice: {
     type: Number,

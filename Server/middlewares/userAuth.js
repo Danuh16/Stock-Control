@@ -1,17 +1,23 @@
-/**
- * @DESC Verify JWT from authorization header Middleware
- */
-const userAuth = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  console.log(process.env.APP_SECRET);
-  if (!authHeader) return res.sendStatus(403);
-  console.log(authHeader); // Bearer token
-  const token = authHeader.split(" ")[1];
-  jwt.verify(token, process.env.APP_SECRET, (err, decoded) => {
-    console.log("verifying");
-    if (err) return res.sendStatus(403); //invalid token
+const checkRoleAndPermission = (allowedRoles, allowedPermissions) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
 
-    console.log(decoded); //for correct token
+    const { role, permissions } = req.user;
+
+    // Check if the user's role is allowed
+    if (!allowedRoles.includes(role)) {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
+    // Check if the user has all required permissions
+    if (!allowedPermissions.every(permission => permissions.includes(permission))) {
+      return res.status(403).json({ message: 'Insufficient permissions' });
+    }
+
     next();
-  });
+  };
 };
+
+module.exports = checkRoleAndPermission;

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const productUnit =require('../constants/Constants')
 
 const productSchema = new mongoose.Schema({
   productId: {
@@ -22,7 +23,7 @@ const productSchema = new mongoose.Schema({
   productUnit: {
     type: String,
     required: true,
-    enum: ['litre', 'gram', 'pieces']
+    enum: Object.values(productUnit)
   },
   productUnitPrice: {
     type: Number,

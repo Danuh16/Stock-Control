@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const stockMovementType = require ('../constants/Constants');
 
 const stockMovementSchema = new mongoose.Schema({
   stockMovementId: {
@@ -22,7 +23,7 @@ const stockMovementSchema = new mongoose.Schema({
   movementType: {
     type: String,
     required: true,
-    enum: ['receipt', 'issue']
+    enum: Object.values(stockMovementType)
   },
   quantity: {
     type: Number,

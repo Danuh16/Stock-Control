@@ -3,6 +3,9 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const router = require("./routes/router");
 const mongoose = require("mongoose");
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./helper/swaggerOptions'); 
+
 require("dotenv/config");
 
 const app = express();
@@ -16,17 +19,18 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/", router);
+
 
 mongoose.set("strictQuery", true);
 
 const mongoURI = process.env.MONGODB_URI;
 
 // Connect to MongoDB using Mongoose
-mongoose
-  .connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+mongoose.connect(mongoURI, {
+    //useNewUrlParser: true,
+    //useUnifiedTopology: true,
   })
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => {

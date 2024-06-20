@@ -1,24 +1,26 @@
 const express = require("express");
 
-export const userRoles = {
-    STOCK_CONTROL: 'stockControl',
-    ADMIN: 'admin',
-    EMPLOYEE: 'employee'
-  };
+// export const userRoles = {
+//     STOCK_CONTROL: 'stockControl',
+//     ADMIN: 'admin',
+//     EMPLOYEE: 'employee'
+//   };
 
-  export const productUnit = {
+const productUnit = {
     LITRE: 'litre',
     GRAM: 'gram',
     PIECES: 'pieces'
   };
-  export const ingredientUnit = {
+  const ingredientUnit = {
     KG: 'kg',
     G: 'g',
     L: 'l',
     ML: 'ml',
     PCS: 'pcs'
   };
-  export const stockMovementType = {
-    IN: 'IN',
-    OUT: 'OUT'
+  const stockMovementType = {
+    RECEIPT: 'receipt', 
+    ISSUE:'issue'
   };
+
+module.exports = {productUnit, ingredientUnit, stockMovementType}
