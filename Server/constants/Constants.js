@@ -1,10 +1,10 @@
 const express = require("express");
 
-// export const userRoles = {
-//     STOCK_CONTROL: 'stockControl',
-//     ADMIN: 'admin',
-//     EMPLOYEE: 'employee'
-//   };
+const Roles = {
+    STOCK_CONTROL: 'stockControl',
+    ADMIN: 'admin',
+    EMPLOYEE: 'employee'
+  };
 
 const productUnit = {
     LITRE: 'litre',
@@ -23,4 +23,4 @@ const productUnit = {
     ISSUE:'issue'
   };
 
-module.exports = {productUnit, ingredientUnit, stockMovementType}
+module.exports = {Roles, productUnit, ingredientUnit, stockMovementType}

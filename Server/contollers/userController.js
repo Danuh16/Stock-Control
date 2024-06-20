@@ -2,7 +2,9 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const Role = require("../models/RoleSchema");
-const User = require('../models/UserSchema');
+const User = require("../models/UserSchema");
+const userAuth = require("../middlewares/auth");
+
 const crypto = require("crypto");
 
 // const secretKey = crypto.randomBytes(32).toString("hex");
@@ -68,7 +70,7 @@ const userLogin = async (req, res) => {
     const { email, password } = req.body;
 
     // Find user by email
-    const user = await User.findOne({ email }).populate('role');
+    const user = await User.findOne({ email }).populate("role");
 
     if (!user) {
       return res.status(404).json({
@@ -114,6 +116,65 @@ const userLogin = async (req, res) => {
   }
 };
 
+// UPDATE USER
+const updateUser = async (req, res) => {
+  try {
+    // Find the user by ID
+    const user = await User.findOne({ _id: req.params.id });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the user has the necessary permissions to update their own profile
+    if (
+      req.user.id !== user._id.toString() &&
+      !req.user.permissions.includes("update_user")
+    ) {
+      return res.status(403).json({ message: "Insufficient permissions" });
+    }
+
+    // Update the user with the new information
+    user.fullName = req.body.fullName || user.fullName;
+    user.email = req.body.email || user.email;
+
+    // Check if the user is trying to update their role
+    if (req.body.role && req.user.permissions.includes("update_user_role")) {
+      const role = await Role.findOne({ module: req.body.role });
+      if (!role) {
+        return res.status(404).json({ message: "Role not found" });
+      }
+      user.role = role._id;
+      user.permissions = role.permissions;
+    }
+
+    await user.save();
+    return res.json(user);
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
+// DELETE USER
+const deleteUser = async (req, res) => {
+  try {
+    // Find the user by ID
+    const user = await User.findOne({ _id: req.params.id });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the user has the necessary permissions to delete the user
+    if (!req.user.permissions.includes("delete_user")) {
+      return res.status(403).json({ message: "Insufficient permissions" });
+    }
+
+    await user.deleteOne();
+    return res.json({ message: "User deleted" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 //LOGOUT LOGIC
 const userLogout = (req, res) => {
   // Clear the token or any session information
@@ -124,4 +185,4 @@ const userLogout = (req, res) => {
   });
 };
 
-module.exports = { userSignup, userLogin, userLogout };
+module.exports = { userSignup, userLogin, userLogout, updateUser, deleteUser };

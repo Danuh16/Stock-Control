@@ -4,8 +4,11 @@ const {
   userSignup,
   userLogin,
   userLogout,
+  updateUser,
+  deleteUser
 } = require("../contollers/userController");
 const User = require("../models/UserSchema");
+const userAuth = require('../middlewares/auth');
 const { getRoles, getRole } = require('../contollers/RoleController');
 const { getPermissionsByRole } = require('../contollers/PermissionController');
 const { assignPermission } = require('../contollers/PermissionAssignController');
@@ -96,37 +99,9 @@ router.get("/userList", async (req, res) => {
 });
 
 // UPDATE USER
-router.patch("/user/update/:id", async (req, res) => {
-  try {
-    const user = await User.findOne({ _id: req.params.id });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Update the user with the new information
-    user.fullName = req.body.fullName || user.fullName;
-    user.email = req.body.email || user.email;
-    user.role = req.body.role || user.role;
-    await user.save();
-    res.json(user);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
-
+router.patch("/user/update/:id", userAuth, updateUser);
 // DELETE USER
-router.delete("/user/delete/:id", async (req, res) => {
-  try {
-    const user = await User.findOne({ _id: req.params.id });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    await user.deleteOne();
-    res.json({ message: "User deleted" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+router.delete("/user/delete/:id", userAuth, deleteUser);
 
 // ROLE GET
 router.get('/roles', getRoles);
