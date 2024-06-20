@@ -116,6 +116,16 @@ const userLogin = async (req, res) => {
   }
 };
 
+//GET ALL USERS
+const GetAllUser =  async (req, res) => {
+  try {
+    const userList = await User.find();
+    res.json(userList);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // UPDATE USER
 const updateUser = async (req, res) => {
   try {
@@ -185,4 +195,4 @@ const userLogout = (req, res) => {
   });
 };
 
-module.exports = { userSignup, userLogin, userLogout, updateUser, deleteUser };
+module.exports = { userSignup, userLogin, userLogout, GetAllUser, updateUser, deleteUser };

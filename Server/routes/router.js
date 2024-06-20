@@ -5,7 +5,8 @@ const {
   userLogin,
   userLogout,
   updateUser,
-  deleteUser
+  deleteUser,
+  GetAllUser
 } = require("../contollers/userController");
 const User = require("../models/UserSchema");
 const userAuth = require('../middlewares/auth');
@@ -89,14 +90,7 @@ router.post("/login/:role", async (req, res) => {
 router.post("/logout", userLogout);
 
 //GET ALL USERS
-router.get("/userList", async (req, res) => {
-  try {
-    const userList = await User.find();
-    res.json(userList);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+router.get("/userList",GetAllUser);
 
 // UPDATE USER
 router.patch("/user/update/:id", userAuth, updateUser);
