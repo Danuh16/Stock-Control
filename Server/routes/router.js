@@ -94,6 +94,7 @@ router.get("/userList",GetAllUser);
 
 // UPDATE USER
 router.patch("/user/update/:id", userAuth, updateUser);
+
 // DELETE USER
 router.delete("/user/delete/:id", userAuth, deleteUser);
 
